@@ -13,15 +13,26 @@
   Important Prameters: 
     TRIGGER_PIN - Pin for Push Button Input (Fault Trigger)
     FAULT_PIN - Pin for Fault Injection (Always HIGH and glitches when Trigger is pushed)
-    FAULT_DURATION - Duration for Fault (Time interval to become LOW)
+    faultDuration - Duration for Fault (Time interval to become LOW)
+    maxFaultDuration - Maximum Fault Duration (Maximum Fault Injection Interval)
     triggerDebounceDelay - Debounce Delay for Trigger (Optional, default works just fine)
 */
 
 #define TRIGGER_PIN D1        // Input Pin 
 #define FAULT_PIN D8          // Output Pin
 
-// Fault Duration
-#define FAULT_DURATION 50
+// Default Define Normal State and Fault State 
+byte normalState = 0x0;
+byte faultState = 0x1; 
+
+// Parameters Fault Duration
+int faultDuration = 0;
+int maxFaultDuration = 0; 
+
+/* State Declaration          
+  0 for Normal State = HIGH and Fault State = LOW 
+  1 for Normal State = LOW and Fault State = HIGH
+*/ 
 
 // Trigger Debounce Mechanism Declarations 
 int triggerState;             // Current State of the Trigger
@@ -32,24 +43,62 @@ unsigned long triggerDebounceDelay = 10;      // Debounce Delay time for Trigger
 
 int counter = 0;   
 
+// Declare States of Operation in Fault Pin
+void state_declaration(int state) {
+  if (state == 0) {
+    normalState = 0x0;
+    faultState = 0x1;
+  } else if (state == 1) {
+    normalState = 0x1;
+    faultState = 0x0;
+  } else {
+    exit(1);
+  }
+}
+
 void setup() {
   pinMode(TRIGGER_PIN, INPUT);          // Button will be connected here 
-  // pinMode(RESET_PIN, INPUT);            // Reset Button will be connected here 
   pinMode(FAULT_PIN, OUTPUT);           // Fault Injection Pin 
-  // pinMode(READY_INDICATOR, OUTPUT);     // Ready State Indicator
 
-  digitalWrite(FAULT_PIN, HIGH);        // Fault Pin State to HIGH
-  // digitalWrite(READY_INDICATOR, HIGH);  // Ready Indicator State to HIGH   
+  maxFaultDuration = 100;
+  state_declaration(1);
+
+  digitalWrite(FAULT_PIN, normalState);        // Fault Pin State to HIGH
   Serial.begin(115200); 
+
+  Serial.setDebugOutput(false);     // Disable debug output
+  Serial.flush();                   // Clear any remaining data in the serial buffer
 }
 
 // Digital Fault Injection Function - Glitch Power Suppy from 1 to 0 (total supply cut)
 void digital_fault_injector(int fault_duration) {
   // Glitch Portion: Set Fault Pin to Low and then up in Fault Duration
-  digitalWrite(FAULT_PIN, LOW);
+  digitalWrite(FAULT_PIN, faultState);
   delayMicroseconds(fault_duration);
   delay(fault_duration);
-  digitalWrite(FAULT_PIN, HIGH);
+  digitalWrite(FAULT_PIN, normalState); // Set back to normal state
+}
+
+// Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions
+
+// Variable Incremental Fault Injector Function
+void digital_incremental_fault_injector(int maxFaultDuration, int incrementFactor) {
+  for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
+    digital_fault_injector(downTime);
+    Serial.print("Downtime: ");
+    Serial.println(downTime);
+    delay(500);
+  }
+}
+
+// Variable Decremental Fault Injector
+void digital_decremental_fault_injector(int maxFaultDuration, int decrementFactor) {
+  for (int downTime = maxFaultDuration; downTime > 0; downTime = downTime - decrementFactor) {
+    digital_fault_injector(downTime);
+    Serial.print("Downtime: ");
+    Serial.println(downTime);
+    delay(500);
+  }
 }
 
 void loop() {
@@ -57,7 +106,7 @@ void loop() {
   // Listen for the Trigger
   while (true) {
 
-    // Debounce Mechansim 
+    // Debounce Mechanism
     int triggerReading = digitalRead(TRIGGER_PIN);  // Read the Trigger Pin 
     if (triggerReading != lastTriggerState) {
       lastTriggerDebounceTime = millis();           // Reset the Trigger Debounce Timer 
@@ -69,7 +118,8 @@ void loop() {
 
         // Fault Injection Function
         if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
-          digital_fault_injector(FAULT_DURATION);
+          digital_incremental_fault_injector(maxFaultDuration, 1);
+
           counter++;
           Serial.print("Fault Number: ");
           Serial.println(counter);
@@ -77,7 +127,6 @@ void loop() {
         break;                                // Break out of the loop
       }
     }
-
     lastTriggerState = triggerReading;    // Update the last trigger state 
   }
 }
