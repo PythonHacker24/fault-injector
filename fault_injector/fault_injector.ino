@@ -18,8 +18,13 @@
     triggerDebounceDelay - Debounce Delay for Trigger (Optional, default works just fine)
 */
 
-#define TRIGGER_PIN D1        // Input Pin 
-#define FAULT_PIN D8          // Output Pin
+// Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
+
+#include <ESP8266WiFi.h>
+
+#define TRIGGER_PIN D1                // Input Pin 
+#define DIGITAL_FAULT_PIN D8          // Digital Output Pin
+#define ANALOG_FAULT_PIN D2           // Analog Output Pin
 
 // Default Define Normal State and Fault State 
 byte normalState = 0x0;
@@ -57,13 +62,17 @@ void state_declaration(int state) {
 }
 
 void setup() {
-  pinMode(TRIGGER_PIN, INPUT);          // Button will be connected here 
-  pinMode(FAULT_PIN, OUTPUT);           // Fault Injection Pin 
+  pinMode(TRIGGER_PIN, INPUT);                  // Button will be connected here 
+  pinMode(DIGITAL_FAULT_PIN, OUTPUT);           // Digital Fault Injection Pin 
+  pinMode(ANALOG_FAULT_PIN, OUTPUT);            // Analog Fault Injection Pin
+
+  analogWriteFreq(1000);                        // Setting PWM Frequency to 1000 Hz 
+  analogWriteResolution(10);                    // Setting PWM Resolution to 10 bits (1024 Levels)
 
   maxFaultDuration = 100;
   state_declaration(1);
 
-  digitalWrite(FAULT_PIN, normalState);        // Fault Pin State to HIGH
+  digitalWrite(DIGITAL_FAULT_PIN, normalState);        // Fault Pin State to HIGH
   Serial.begin(115200); 
 
   Serial.setDebugOutput(false);     // Disable debug output
@@ -73,10 +82,10 @@ void setup() {
 // Digital Fault Injection Function - Glitch Power Suppy from 1 to 0 (total supply cut)
 void digital_fault_injector(int fault_duration) {
   // Glitch Portion: Set Fault Pin to Low and then up in Fault Duration
-  digitalWrite(FAULT_PIN, faultState);
+  digitalWrite(DIGITAL_FAULT_PIN, faultState);
   delayMicroseconds(fault_duration);
   delay(fault_duration);
-  digitalWrite(FAULT_PIN, normalState); // Set back to normal state
+  digitalWrite(DIGITAL_FAULT_PIN, normalState); // Set back to normal state
 }
 
 // Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions
