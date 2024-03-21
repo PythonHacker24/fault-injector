@@ -7,7 +7,7 @@
   Requirements:
     Push Button - Trigger Button 
     Jumper Wires 
-    Pull Down Resisitors - 10K Ohms for Fault Pin 
+    Pull Down Resistors - 10K Ohms for Fault Pin 
 
   Parameters can be varied in the code for adjusting pinouts. 
   Important Prameters: 
