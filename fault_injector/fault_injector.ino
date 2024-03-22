@@ -45,6 +45,11 @@ int maxFaultDuration = 0;
 int triggerState;             // Current State of the Trigger
 int lastTriggerState = LOW;   // Initialise last trigger state to LOW
 
+// Stepping Debounce Mechanism Declarations 
+int stepperState;
+int lastStepperState = LOW;
+
+unsigned long lastStepperDebounceTime = 0;
 unsigned long lastTriggerDebounceTime = 0;    // Last time when the Trigger was pressed 
 unsigned long universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
 
@@ -136,14 +141,56 @@ void digital_decremental_interrupt_fault_injector(int initialDuration, int maxFa
 // Stepping up and down allows user to step up or down the voltage by some factor with buttons. 
 // This is particularly helpful for debugging manually and finding the correct time duration for fault injection
 void step_up_digital_incremental_interrupt_fault_injector(int initialDuration, int incrementFactor) {
+  int intervalFactor = 0;
   while (true) {
     // Listen for the stepping triggers 
     while (true) {
       
+      int stepperReading = digitalRead(INTERRUPT_PIN);
+      if (stepperReading != lastStepperState) {
+        lastStepperDebounceTime = millis();
+      }
+      if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
+        if (stepperReading != stepperState) {
+          stepperState = stepperReading;
+
+          if (lastStepperState == LOW) {
+            digital_fault_injector(initialDuration + intervalFactor);
+          }
+          break;
+        }
+      }
+      lastStepperState = stepperReading;
+    }
+    intervalFactor += incrementFactor;
   }
 }
 
-void step_up_digital_decremental_interrupt_fault_injector(int initialDuration, int decrementFactor)
+void step_down_digital_decremental_interrupt_fault_injector(int initialDuration, int decrementFactor) {
+  int intervalFactor = 0;
+  while (true) {
+    // Listen for the stepping triggers 
+    while (true) {
+      
+      int stepperReading = digitalRead(INTERRUPT_PIN);
+      if (stepperReading != lastStepperState) {
+        lastStepperDebounceTime = millis();
+      }
+      if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
+        if (stepperReading != stepperState) {
+          stepperState = stepperReading;
+
+          if (lastStepperState == LOW) {
+            digital_fault_injector(initialDuration - intervalFactor);
+          }
+          break;
+        }
+      }
+      lastStepperState = stepperReading;
+    }
+    intervalFactor += decrementFactor;
+  }
+}
 
 void loop() {
 
@@ -162,7 +209,7 @@ void loop() {
 
         // Fault Injection Function
         if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
-          digital_incremental_fault_injector(0, maxFaultDuration, 1);
+          digital_incremental_interrupt_fault_injector(0, maxFaultDuration, 1);
 
           counter++;
           Serial.print("Fault Number: ");
