@@ -24,6 +24,9 @@ The time adjustments in fault injections is an important factor to consider and 
 #### Feedback Loop Support Via Interrupt Pin 
 Triggering of Injections can be varied with feedbacks with external signals. This allows fault injections with precise timing into the electronic circuits upon certian events. This is included in the triggered fault injections, incremental fault injections as well as decremental fault injections. 
 
+#### Step by Step Increments and Decrements 
+Stepping up and down with push buttons to adjust voltage glitches helps in finding the exact spot for the fault injection attack with manual analysis. This feature allows users to use push button to increment or decrement (as per the functions setup) and step through various time delays to manually analyse the behaviour of the target.   
+
 ## Setting up the circuit
 
 The code provided here is nearly enough to explain the wiring diagram of the circuit. Various parameters needs to be adjusted while developing the circuit, hence adjusting them before flashing the microcontroller is a good practice.
