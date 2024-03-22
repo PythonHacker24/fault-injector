@@ -21,6 +21,9 @@
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
 // Add Setp by Step Incremental and Decremental Functions, but first test the current functionalities
   // Initial Duration and Increment Factor or Decrement Factor must be the arguements 
+// Add 2 modes of usage 
+  // 1. IC2 Display mode: A portable fault injection device
+  // 2. Serial Communication Control: Fault Injection Attacks with Serial Console
 
 #include <ESP8266WiFi.h>
 
