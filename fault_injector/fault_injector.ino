@@ -57,10 +57,10 @@ int counter = 0;
 
 // Declare States of Operation in Fault Pin
 void state_declaration(int state) {
-  if (state == 0) {
+  if (state == 0) {                   // 0 state means signal is low usually and gets high during the glitch 
     normalState = 0x0;
     faultState = 0x1;
-  } else if (state == 1) {
+  } else if (state == 1) {            // 1 state means signal is high usually and gets low during the glitch
     normalState = 0x1;
     faultState = 0x0;
   } else {
