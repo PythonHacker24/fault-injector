@@ -19,7 +19,8 @@
 */
 
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
-// Add Setp by Step Incremental and Decremental Functions 
+// Add Setp by Step Incremental and Decremental Functions, but first test the current functionalities
+  // Initial Duration and Increment Factor or Decrement Factor must be the arguements 
 
 #include <ESP8266WiFi.h>
 
@@ -94,10 +95,11 @@ void digital_interrupted_fault_injector(int fault_duration) {
   }
 }
 
-// Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions
+// Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions 
 
 // Variable Incremental Fault Injector Function
 void digital_incremental_interrupt_fault_injector(int maxFaultDuration, int incrementFactor) {
+  // D4 will be the interrupt reading
   int interruptReading;
   for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
     interruptReading = digitalRead(INTERRUPT_PIN);
@@ -113,6 +115,7 @@ void digital_incremental_interrupt_fault_injector(int maxFaultDuration, int incr
 
 // Variable Decremental Fault Injector Funcrion
 void digital_decremental_interrupt_fault_injector(int maxFaultDuration, int decrementFactor) {
+  // D4 will be the interrupt reading
   int interruptReading;
   for (int downTime = maxFaultDuration; downTime > 0; downTime = downTime - decrementFactor) {
     interruptReading = digitalRead(INTERRUPT_PIN);
