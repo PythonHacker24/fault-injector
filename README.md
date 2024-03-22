@@ -1,3 +1,4 @@
+
 # Fault Injector for ESP8266 and Arduino Boards 
 
 ![Intro](https://raw.githubusercontent.com/PythonHacker24/fault-injector/main/images/intro-image.png)
@@ -14,7 +15,15 @@ This attack is useful in cases of jumping instructions inside a microprocessor o
 
 Since fault injections are so cool and need to be precise, a lot of work has to be put into doing it. It becomes expensive to carry out these attacks with dedicated tools and circuit. Hence, this project was developed, where efforts have been made to develop a device that can be crafted with inexpensive microcontrollers like ESP8266, which is developed with all required functionalities, or as much as possible. 
 
+### Features
+#### Precise Time Adjustments 
+This prototype with ESP8266 supports fault injections with microseconds of delay which can be adjusted. This is something that dependes upon the hardware used and it's support to causing delays.
 
+#### Incremental and Decremental Fault Injections 
+The time adjustments in fault injections is an important factor to consider and varies according to different circuits. Hence, moving step by step with increasing and decreasing fault injection periods can help find the exact glitch required for the attack. This helps in analysing the circuit behaviour of the circuit and developing stratergy of attack, or even hit the goal in time. 
+
+#### Feedback Loop Support Via Interrupt Pin 
+Triggering of Injections can be varied with feedbacks with external signals. This allows fault injections with precise timing into the electronic circuits upon certian events. This is included in the triggered fault injections, incremental fault injections as well as decremental fault injections. 
 
 ## Setting up the circuit
 
@@ -39,4 +48,3 @@ The author of the project is not responsible for any damage caused by the projec
 ## Development of the Project  
 
 This project is under development process and the steps might vary from the documentation. Efforts are made to keep the documentation in par with the development process. Hence, refering to the code is useful while working with it to make sure things go as expected. 
-
