@@ -1,5 +1,7 @@
 # Fault Injector for ESP8266 and Arduino Boards 
 
+![Intro](https://raw.githubusercontent.com/PythonHacker24/fault-injector/main/images/intro-image.png)
+
 Fault Injection Attacks is an hardware attack that glitches a hardware circuit to behave in a way which is not intended and cause uncertain behaviour that would be useful for a hacker. 
 
 Provided code injects a fault of specified duration and amplitude which can be interfaced with other circuits to perform a fault injection attack. 
