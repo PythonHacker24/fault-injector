@@ -46,7 +46,7 @@ int triggerState;             // Current State of the Trigger
 int lastTriggerState = LOW;   // Initialise last trigger state to LOW
 
 unsigned long lastTriggerDebounceTime = 0;    // Last time when the Trigger was pressed 
-unsigned long triggerDebounceDelay = 10;      // Debounce Delay time for Trigger
+unsigned long universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
 
 int counter = 0;   
 
@@ -102,7 +102,7 @@ void digital_interrupted_fault_injector(int fault_duration) {
 // Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions 
 
 // Variable Incremental Fault Injector Function
-void digital_incremental_interrupt_fault_injector(int maxFaultDuration, int incrementFactor) {
+void digital_incremental_interrupt_fault_injector(int initialDuration, int maxFaultDuration, int incrementFactor) {
   // D4 will be the interrupt reading
   int interruptReading;
   for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
@@ -118,10 +118,10 @@ void digital_incremental_interrupt_fault_injector(int maxFaultDuration, int incr
 }
 
 // Variable Decremental Fault Injector Funcrion
-void digital_decremental_interrupt_fault_injector(int maxFaultDuration, int decrementFactor) {
+void digital_decremental_interrupt_fault_injector(int initialDuration, int maxFaultDuration, int decrementFactor) {
   // D4 will be the interrupt reading
   int interruptReading;
-  for (int downTime = maxFaultDuration; downTime > 0; downTime = downTime - decrementFactor) {
+  for (int downTime = maxFaultDuration; downTime > initialDuration; downTime = downTime - decrementFactor) {
     interruptReading = digitalRead(INTERRUPT_PIN);
     if (interruptReading == HIGH) {
       break;
@@ -132,6 +132,18 @@ void digital_decremental_interrupt_fault_injector(int maxFaultDuration, int decr
     delay(500);
   }
 }
+
+// Stepping up and down allows user to step up or down the voltage by some factor with buttons. 
+// This is particularly helpful for debugging manually and finding the correct time duration for fault injection
+void step_up_digital_incremental_interrupt_fault_injector(int initialDuration, int incrementFactor) {
+  while (true) {
+    // Listen for the stepping triggers 
+    while (true) {
+      
+  }
+}
+
+void step_up_digital_decremental_interrupt_fault_injector(int initialDuration, int decrementFactor)
 
 void loop() {
 
@@ -144,13 +156,13 @@ void loop() {
       lastTriggerDebounceTime = millis();           // Reset the Trigger Debounce Timer 
     }
 
-    if ((millis() - lastTriggerDebounceTime) > triggerDebounceDelay) {    // Check if Debounce Delay for Trigger Pin has been passed
+    if ((millis() - lastTriggerDebounceTime) > universalDebounceDelay) {    // Check if Debounce Delay for Trigger Pin has been passed
       if (triggerReading != triggerState) {
         triggerState = triggerReading;         // Set Trigger State to new Trigger Reading 
 
         // Fault Injection Function
         if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
-          digital_incremental_fault_injector(maxFaultDuration, 1);
+          digital_incremental_fault_injector(0, maxFaultDuration, 1);
 
           counter++;
           Serial.print("Fault Number: ");

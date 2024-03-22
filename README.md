@@ -1,4 +1,3 @@
-
 # Fault Injector for ESP8266 and Arduino Boards 
 
 ![Intro](https://raw.githubusercontent.com/PythonHacker24/fault-injector/main/images/intro-image.png)
@@ -55,3 +54,7 @@ The author of the project is not responsible for any damage caused by the projec
 ## Development of the Project  
 
 This project is under development process and the steps might vary from the documentation. Efforts are made to keep the documentation in par with the development process. Hence, refering to the code is useful while working with it to make sure things go as expected. 
+
+## License 
+
+This project is licensed under the MIT License - see the [LICENSE](https://raw.githubusercontent.com/PythonHacker24/fault-injector/main/LICENSE) file for details.
