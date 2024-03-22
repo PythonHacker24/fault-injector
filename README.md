@@ -29,6 +29,13 @@ Triggering of Injections can be varied with feedbacks with external signals. Thi
 
 The code provided here is nearly enough to explain the wiring diagram of the circuit. Various parameters needs to be adjusted while developing the circuit, hence adjusting them before flashing the microcontroller is a good practice.
 
+```
+#define TRIGGER_PIN D1                // Trigger Input Pin (Pull Down Register is Required)
+#define DIGITAL_FAULT_PIN D2          // Digital Output Pin
+#define ANALOG_FAULT_PIN D3           // Analog Output Pin
+#define INTERRUPT_PIN D4              // Interupt Input Pin (Pull Down Register is Required)
+```
+
 #### Requirements:
 - ESP8266 (or ESP32, Arduino, etc. just adjust the code as per the device interfacing)
 - Push Buttons
