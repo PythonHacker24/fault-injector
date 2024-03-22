@@ -22,9 +22,10 @@
 
 #include <ESP8266WiFi.h>
 
-#define TRIGGER_PIN D1                // Input Pin 
-#define DIGITAL_FAULT_PIN D8          // Digital Output Pin
-#define ANALOG_FAULT_PIN D2           // Analog Output Pin
+#define TRIGGER_PIN D1                // Trigger Input Pin (Pull Down Register is Required)
+#define DIGITAL_FAULT_PIN D2          // Digital Output Pin
+#define ANALOG_FAULT_PIN D3           // Analog Output Pin
+#define INTERRUPT_PIN D4              // Interupt Input Pin (Pull Down Register is Required)
 
 // Default Define Normal State and Fault State 
 byte normalState = 0x0;
@@ -33,11 +34,6 @@ byte faultState = 0x1;
 // Parameters Fault Duration
 int faultDuration = 0;
 int maxFaultDuration = 0; 
-
-/* State Declaration          
-  0 for Normal State = HIGH and Fault State = LOW 
-  1 for Normal State = LOW and Fault State = HIGH
-*/ 
 
 // Trigger Debounce Mechanism Declarations 
 int triggerState;             // Current State of the Trigger
@@ -62,7 +58,8 @@ void state_declaration(int state) {
 }
 
 void setup() {
-  pinMode(TRIGGER_PIN, INPUT);                  // Button will be connected here 
+  pinMode(TRIGGER_PIN, INPUT);                  // Trigger Button will be connected here
+  pinMode(INTERRUPT_PIN, INPUT);                // Interrupt Signal 
   pinMode(DIGITAL_FAULT_PIN, OUTPUT);           // Digital Fault Injection Pin 
   pinMode(ANALOG_FAULT_PIN, OUTPUT);            // Analog Fault Injection Pin
 
@@ -84,15 +81,28 @@ void digital_fault_injector(int fault_duration) {
   // Glitch Portion: Set Fault Pin to Low and then up in Fault Duration
   digitalWrite(DIGITAL_FAULT_PIN, faultState);
   delayMicroseconds(fault_duration);
-  delay(fault_duration);
   digitalWrite(DIGITAL_FAULT_PIN, normalState); // Set back to normal state
+}
+
+// Digital Fault Injection Function with Interrupt
+void digital_interrupted_fault_injector(int fault_duration) {
+  int interruptReading = digitalRead(INTERRUPT_PIN); 
+  if (interruptReading == HIGH) {
+    digital_fault_injector(fault_duration);
+    Serial.println("Fault Injected on Interrupt!");
+  }
 }
 
 // Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions
 
 // Variable Incremental Fault Injector Function
-void digital_incremental_fault_injector(int maxFaultDuration, int incrementFactor) {
+void digital_incremental_interrupt_fault_injector(int maxFaultDuration, int incrementFactor) {
+  int interruptReading;
   for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
+    interruptReading = digitalRead(INTERRUPT_PIN);
+    if (interruptReading == HIGH) { 
+      break; 
+    }
     digital_fault_injector(downTime);
     Serial.print("Downtime: ");
     Serial.println(downTime);
@@ -100,9 +110,14 @@ void digital_incremental_fault_injector(int maxFaultDuration, int incrementFacto
   }
 }
 
-// Variable Decremental Fault Injector
-void digital_decremental_fault_injector(int maxFaultDuration, int decrementFactor) {
+// Variable Decremental Fault Injector Funcrion
+void digital_decremental_interrupt_fault_injector(int maxFaultDuration, int decrementFactor) {
+  int interruptReading;
   for (int downTime = maxFaultDuration; downTime > 0; downTime = downTime - decrementFactor) {
+    interruptReading = digitalRead(INTERRUPT_PIN);
+    if (interruptReading == HIGH) {
+      break;
+    }
     digital_fault_injector(downTime);
     Serial.print("Downtime: ");
     Serial.println(downTime);
