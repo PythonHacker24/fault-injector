@@ -28,10 +28,10 @@
 
 #include <ESP8266WiFi.h>
 
-#define TRIGGER_PIN D1                // Trigger Input Pin (Pull Down Register is Required)
-#define DIGITAL_FAULT_PIN D2          // Digital Output Pin
-#define ANALOG_FAULT_PIN D3           // Analog Output Pin
-#define INTERRUPT_PIN D4              // Interupt Input Pin (Pull Down Register is Required)
+uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Register is Required)
+uint8_t DIGITAL_FAULT_PIN = D2;          // Digital Output Pin
+uint8_t ANALOG_FAULT_PIN = D3;           // Analog Output Pin
+uint8_t INTERRUPT_PIN = D4;              // Interupt Input Pin (Pull Down Register is Required)
 
 // Default Define Normal State and Fault State 
 byte normalState = 0x0;
@@ -40,6 +40,10 @@ byte faultState = 0x1;
 // Parameters Fault Duration
 int faultDuration = 0;
 int maxFaultDuration = 0; 
+
+int incrementFactor = 0;
+int decrementFactor = 0;
+int initialDuration = 0; 
 
 // Trigger Debounce Mechanism Declarations 
 int triggerState;             // Current State of the Trigger
@@ -54,6 +58,7 @@ unsigned long lastTriggerDebounceTime = 0;    // Last time when the Trigger was 
 unsigned long universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
 
 int counter = 0;   
+int state = 0;
 
 // Declare States of Operation in Fault Pin
 void state_declaration(int state) {
@@ -78,7 +83,7 @@ void setup() {
   analogWriteResolution(10);                    // Setting PWM Resolution to 10 bits (1024 Levels)
 
   maxFaultDuration = 100;
-  state_declaration(1);
+  state_declaration(state);
 
   digitalWrite(DIGITAL_FAULT_PIN, normalState);        // Fault Pin State to HIGH
   Serial.begin(115200); 
@@ -140,6 +145,7 @@ void digital_decremental_interrupt_fault_injector(int initialDuration, int maxFa
 
 // Stepping up and down allows user to step up or down the voltage by some factor with buttons. 
 // This is particularly helpful for debugging manually and finding the correct time duration for fault injection
+// Here, D4 is now the stepping function
 void step_up_digital_incremental_interrupt_fault_injector(int initialDuration, int incrementFactor) {
   int intervalFactor = 0;
   while (true) {
@@ -192,32 +198,156 @@ void step_down_digital_decremental_interrupt_fault_injector(int initialDuration,
   }
 }
 
+void serial_console() {
+
+  Serial.flush();
+  const char* setCommands[] = {
+    "TP",                             // Set Trigger Pin
+    "DFP",                            // Set Digital Fault Pin
+    "AFP",                            // Set Analog Fault Pin
+    "IP",                             // Set Interrupt Pin
+    "ST",                             // Set State 
+    "MFD",                            // Set Maximum Fault Duration
+    "UDD"                             // Set Universal Debounce Delay
+    "IF",                             // Set Increment Factor 
+    "DF",                             // Set Decrement Factor 
+    "ID",                             // Set Initial Duration
+  };
+
+  if (Serial.available()) {                         // Check the availability of Serial Console 
+    String command = Serial.readStringUntil('\n');  // Take commands from the Serial Console 
+
+    // Parameter Setting Section 
+    if (command.startsWith("set")) {
+      String variableName = command.substring(4, command.indexOf(' ', 4));
+      String valueString = command.substring(command.lastIndexOf(' ') + 1);
+      int value = valueString.toInt();
+      
+      if (variableName == setCommands[0]) {
+        TRIGGER_PIN = value;
+        Serial.print("Trigger Pin = ");
+        Serial.println(value);
+      } else if (variableName == setCommands[1]) {
+        DIGITAL_FAULT_PIN = value;
+        Serial.print("Digital Fault Pin = ");
+        Serial.println(value);
+      } else if (variableName == setCommands[2]) {
+        ANALOG_FAULT_PIN = value;
+        Serial.print("Analog Fault Pin = ");
+        Serial.println(value);
+      } else if (variableName == setCommands[3]) {
+        INTERRUPT_PIN = value;
+        Serial.print("Interrupt Pin = ");
+        Serial.println(value);
+      } else if (variableName == setCommands[4]) {
+        state = value;
+        Serial.print("State = ");
+        Serial.print(value);
+        if (state == 0) {
+          Serial.println("Normal State = LOW and Fault State = HIGH");
+        } else if (state == 1) {
+          Serial.println("Normal State = HIGH and Fault State = LOW"); 
+        } else {
+          Serial.println("Invalid State! back to default");
+          state = 0; 
+          Serial.print("State = ");
+          Serial.println(state);
+          Serial.println("Normal State = LOW and Fault State = HIGH");
+        }
+      } else if (variableName == setCommands[5]) {
+        maxFaultDuration = value;
+        Serial.print("Maximum Fault Duration = ");
+        Serial.println(maxFaultDuration);
+      } else if (variableName == setCommands[6]) {
+        universalDebounceDelay = value;
+        Serial.print("Universal Debounce Delay = ");
+        Serial.println(universalDebounceDelay);
+      } else if (variableName == setCommands[7]) {
+        incrementFactor = value;
+        Serial.print("Increment Factor = ");
+        Serial.println(incrementFactor);
+      } else if (variableName == setCommands[8]) {
+        decrementFactor = value;
+        Serial.print("Decrement Factor = ");
+        Serial.println(decrementFactor);
+      } else if (variableName == setCommands[9]) {
+        initialDuration = value;
+        Serial.print("Initial Duration = ");
+        Serial.println(initialDuration);
+      } else {
+        Serial.println("Invalid Command!");
+      }
+    } else if (command.startsWith("LIST")) {
+      Serial.print("Trigger Pin = ");
+      Serial.println(TRIGGER_PIN);
+
+      Serial.print("Digital Fault Pin = ");
+      Serial.println(DIGITAL_FAULT_PIN);
+
+      Serial.print("Analog Fault Pin = ");
+      Serial.println(ANALOG_FAULT_PIN);
+
+      Serial.print("Interrupt Pin = ");
+      Serial.println(INTERRUPT_PIN);
+
+      Serial.print("State = ");
+      Serial.print(state);
+      if (state == 0) {
+        Serial.println("Normal State = LOW and Fault State = HIGH");
+      } else if (state == 1) {
+        Serial.println("Normal State = HIGH and Fault State = LOW"); 
+      }
+
+      Serial.print("Maximum Fault Duration = ");
+      Serial.println(maxFaultDuration);      
+
+      Serial.print("Universal Debounce Delay = ");
+      Serial.println(universalDebounceDelay);
+
+      Serial.print("Increment Factor = ");
+      Serial.println(incrementFactor);
+
+      Serial.print("Decrement Factor = ");
+      Serial.println(decrementFactor);
+
+      Serial.print("Initial Duration = ");
+      Serial.println(initialDuration);
+    }
+    else if (command.startsWith("execute")) {
+      Serial.println("Under Development!");
+    } 
+    Serial.println("");
+  }
+}
+
 void loop() {
 
-  // Listen for the Trigger
-  while (true) {
+  serial_console();
 
-    // Debounce Mechanism
-    int triggerReading = digitalRead(TRIGGER_PIN);  // Read the Trigger Pin 
-    if (triggerReading != lastTriggerState) {
-      lastTriggerDebounceTime = millis();           // Reset the Trigger Debounce Timer 
-    }
+  // // Listen for the Trigger
+  // while (true) {
 
-    if ((millis() - lastTriggerDebounceTime) > universalDebounceDelay) {    // Check if Debounce Delay for Trigger Pin has been passed
-      if (triggerReading != triggerState) {
-        triggerState = triggerReading;         // Set Trigger State to new Trigger Reading 
+  //   // Debounce Mechanism
+  //   int triggerReading = digitalRead(TRIGGER_PIN);  // Read the Trigger Pin 
+  //   if (triggerReading != lastTriggerState) {
+  //     lastTriggerDebounceTime = millis();           // Reset the Trigger Debounce Timer 
+  //   }
 
-        // Fault Injection Function
-        if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
-          digital_incremental_interrupt_fault_injector(0, maxFaultDuration, 1);
+  //   if ((millis() - lastTriggerDebounceTime) > universalDebounceDelay) {    // Check if Debounce Delay for Trigger Pin has been passed
+  //     if (triggerReading != triggerState) {
+  //       triggerState = triggerReading;         // Set Trigger State to new Trigger Reading 
 
-          counter++;
-          Serial.print("Fault Number: ");
-          Serial.println(counter);
-        }
-        break;                                // Break out of the loop
-      }
-    }
-    lastTriggerState = triggerReading;    // Update the last trigger state 
-  }
+  //       // Fault Injection Function
+  //       if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
+  //         digital_incremental_interrupt_fault_injector(0, maxFaultDuration, 1);
+
+  //         counter++;
+  //         Serial.print("Fault Number: ");
+  //         Serial.println(counter);
+  //       }
+  //       break;                                // Break out of the loop
+  //     }
+  //   }
+  //   lastTriggerState = triggerReading;    // Update the last trigger state 
+  // }
 }
