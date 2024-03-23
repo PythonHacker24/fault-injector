@@ -12,10 +12,9 @@
   Parameters can be varied in the code for adjusting pinouts. 
   Important Prameters: 
     TRIGGER_PIN - Pin for Push Button Input (Fault Trigger)
-    FAULT_PIN - Pin for Fault Injection (Always HIGH and glitches when Trigger is pushed)
-    faultDuration - Duration for Fault (Time interval to become LOW)
-    maxFaultDuration - Maximum Fault Duration (Maximum Fault Injection Interval)
-    triggerDebounceDelay - Debounce Delay for Trigger (Optional, default works just fine)
+    DIGITAL_FAULT_PIN - Pin for Digital Fault Injection 
+    ANALOG_FAULT_PIN - Pin for Analog Fault Injection 
+    INTERRUPT_PIN - Interrupt Input Pin
 */
 
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
