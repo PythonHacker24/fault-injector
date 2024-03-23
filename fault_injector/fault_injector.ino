@@ -39,7 +39,7 @@ byte faultState = 0x1;
 
 // Parameters Fault Duration
 int faultDuration = 0;
-int maxFaultDuration = 0; 
+int maxFaultDuration = 100; 
 
 int incrementFactor = 0;
 int decrementFactor = 0;
@@ -55,7 +55,7 @@ int lastStepperState = LOW;
 
 unsigned long lastStepperDebounceTime = 0;
 unsigned long lastTriggerDebounceTime = 0;    // Last time when the Trigger was pressed 
-unsigned long universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
+int universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
 
 int counter = 0;   
 int state = 0;
@@ -82,11 +82,10 @@ void setup() {
   analogWriteFreq(1000);                        // Setting PWM Frequency to 1000 Hz 
   analogWriteResolution(10);                    // Setting PWM Resolution to 10 bits (1024 Levels)
 
-  maxFaultDuration = 100;
   state_declaration(state);
 
   digitalWrite(DIGITAL_FAULT_PIN, normalState);        // Fault Pin State to HIGH
-  Serial.begin(115200); 
+  Serial.begin(9600); 
 
   Serial.setDebugOutput(false);     // Disable debug output
   Serial.flush();                   // Clear any remaining data in the serial buffer
@@ -244,9 +243,9 @@ void serial_console() {
         Serial.print("State = ");
         Serial.print(value);
         if (state == 0) {
-          Serial.println("Normal State = LOW and Fault State = HIGH");
+          Serial.println(" - Normal State = LOW and Fault State = HIGH");
         } else if (state == 1) {
-          Serial.println("Normal State = HIGH and Fault State = LOW"); 
+          Serial.println(" - Normal State = HIGH and Fault State = LOW"); 
         } else {
           Serial.println("Invalid State! back to default");
           state = 0; 
@@ -293,9 +292,9 @@ void serial_console() {
       Serial.print("State = ");
       Serial.print(state);
       if (state == 0) {
-        Serial.println("Normal State = LOW and Fault State = HIGH");
+        Serial.println(" - Normal State = LOW and Fault State = HIGH");
       } else if (state == 1) {
-        Serial.println("Normal State = HIGH and Fault State = LOW"); 
+        Serial.println(" - Normal State = HIGH and Fault State = LOW"); 
       }
 
       Serial.print("Maximum Fault Duration = ");
