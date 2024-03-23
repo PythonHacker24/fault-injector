@@ -19,8 +19,10 @@
 */
 
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
+
 // Add Setp by Step Incremental and Decremental Functions, but first test the current functionalities
   // Initial Duration and Increment Factor or Decrement Factor must be the arguements 
+
 // Add 2 modes of usage 
   // 1. IC2 Display mode: A portable fault injection device
   // 2. Serial Communication Control: Fault Injection Attacks with Serial Console (work on this one first)
@@ -55,7 +57,7 @@ int lastStepperState = LOW;
 
 unsigned long lastStepperDebounceTime = 0;
 unsigned long lastTriggerDebounceTime = 0;    // Last time when the Trigger was pressed 
-int universalDebounceDelay = 10;      // Debounce Delay time for all buttons 
+int universalDebounceDelay = 10;              // Debounce Delay time for all buttons 
 
 int counter = 0;   
 int state = 0;
@@ -201,16 +203,21 @@ void serial_console() {
 
   Serial.flush();
   const char* setCommands[] = {
-    "TP",                             // Set Trigger Pin
-    "DFP",                            // Set Digital Fault Pin
-    "AFP",                            // Set Analog Fault Pin
-    "IP",                             // Set Interrupt Pin
     "ST",                             // Set State 
     "MFD",                            // Set Maximum Fault Duration
-    "UDD"                             // Set Universal Debounce Delay
+    "UDD",                            // Set Universal Debounce Delay
     "IF",                             // Set Increment Factor 
     "DF",                             // Set Decrement Factor 
     "ID",                             // Set Initial Duration
+  };
+
+  const char* commandInfo[] = {
+    "Set State (0 for Fault Pin to be LOW in normal state and 1 for Fault Pin to be HIGH in normal state)",
+    "Maximum Fault Duration (Maximum Fault Duration to permit for incremental stepping)",
+    "Universal Debounce Delay (Debounce Period for buttons in the circuit",
+    "Increment Factor (Time Period to increment in incremental stepping)",
+    "Decrement Factor (Time Period to decrement in decremental stepping", 
+    "Initial Duration (Initial Duration for incremental and decremental stepping)",
   };
 
   if (Serial.available()) {                         // Check the availability of Serial Console 
@@ -222,26 +229,11 @@ void serial_console() {
       String valueString = command.substring(command.lastIndexOf(' ') + 1);
       int value = valueString.toInt();
       
+
       if (variableName == setCommands[0]) {
-        TRIGGER_PIN = value;
-        Serial.print("Trigger Pin = ");
-        Serial.println(value);
-      } else if (variableName == setCommands[1]) {
-        DIGITAL_FAULT_PIN = value;
-        Serial.print("Digital Fault Pin = ");
-        Serial.println(value);
-      } else if (variableName == setCommands[2]) {
-        ANALOG_FAULT_PIN = value;
-        Serial.print("Analog Fault Pin = ");
-        Serial.println(value);
-      } else if (variableName == setCommands[3]) {
-        INTERRUPT_PIN = value;
-        Serial.print("Interrupt Pin = ");
-        Serial.println(value);
-      } else if (variableName == setCommands[4]) {
         state = value;
         Serial.print("State = ");
-        Serial.print(value);
+        Serial.println(value);
         if (state == 0) {
           Serial.println(" - Normal State = LOW and Fault State = HIGH");
         } else if (state == 1) {
@@ -253,23 +245,23 @@ void serial_console() {
           Serial.println(state);
           Serial.println("Normal State = LOW and Fault State = HIGH");
         }
-      } else if (variableName == setCommands[5]) {
+      } else if (variableName == setCommands[1]) {
         maxFaultDuration = value;
         Serial.print("Maximum Fault Duration = ");
         Serial.println(maxFaultDuration);
-      } else if (variableName == setCommands[6]) {
+      } else if (variableName == setCommands[2]) {
         universalDebounceDelay = value;
         Serial.print("Universal Debounce Delay = ");
         Serial.println(universalDebounceDelay);
-      } else if (variableName == setCommands[7]) {
+      } else if (variableName == setCommands[3]) {
         incrementFactor = value;
         Serial.print("Increment Factor = ");
         Serial.println(incrementFactor);
-      } else if (variableName == setCommands[8]) {
+      } else if (variableName == setCommands[4]) {
         decrementFactor = value;
         Serial.print("Decrement Factor = ");
         Serial.println(decrementFactor);
-      } else if (variableName == setCommands[9]) {
+      } else if (variableName == setCommands[5]) {
         initialDuration = value;
         Serial.print("Initial Duration = ");
         Serial.println(initialDuration);
@@ -296,7 +288,6 @@ void serial_console() {
       } else if (state == 1) {
         Serial.println(" - Normal State = HIGH and Fault State = LOW"); 
       }
-
       Serial.print("Maximum Fault Duration = ");
       Serial.println(maxFaultDuration);      
 
@@ -311,10 +302,20 @@ void serial_console() {
 
       Serial.print("Initial Duration = ");
       Serial.println(initialDuration);
-    }
-    else if (command.startsWith("execute")) {
+
+    }  else if (command.startsWith("execute")) {
       Serial.println("Under Development!");
-    } 
+    } else if (command.startsWith("HELP")) {
+      Serial.println("Fault Injector - A Fault Injection Toolkit\n");
+      Serial.println("- All time values are in Mircoseconds\n");
+      for (int index = 0; index < 5; index++) {
+        Serial.print(setCommands[index]);
+        Serial.print(" - ");
+        Serial.println(commandInfo[index]);
+      }
+    } else if (command.startsWith("EXIT")) {
+      Serial.println("Exiting Serial Console");
+    }
     Serial.println("");
   }
 }
