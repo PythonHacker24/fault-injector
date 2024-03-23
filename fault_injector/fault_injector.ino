@@ -21,12 +21,9 @@
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
 
 // Add Setp by Step Incremental and Decremental Functions, but first test the current functionalities
-  // Initial Duration and Increment Factor or Decrement Factor must be the arguements 
+// Initial Duration and Increment Factor or Decrement Factor must be the arguements 
 
-// Add 2 modes of usage 
-  // 1. IC2 Display mode: A portable fault injection device
-  // 2. Serial Communication Control: Fault Injection Attacks with Serial Console (work on this one first)
-  // 3. Add Clock Fault Injection Support: When Pulse is HIGH, glitch with LOW Voltage. When Pulse is LOW, glitch with HIGH Voltage.
+// Add Clock Fault Injection Support: When Pulse is HIGH, glitch with LOW Voltage. When Pulse is LOW, glitch with HIGH Voltage.
 
 #include <ESP8266WiFi.h>
 
@@ -335,7 +332,7 @@ void serial_console() {
 
       Serial.print("Initial Duration = ");
       Serial.println(initialDuration);
-      
+
     } else if (command.startsWith("HELP")) {
       Serial.println("Fault Injector - A Fault Injection Toolkit\n");
       Serial.println("- All time values are in Mircoseconds\n");
