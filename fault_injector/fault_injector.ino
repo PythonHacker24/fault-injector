@@ -208,13 +208,33 @@ void serial_console() {
     "ID",                             // Set Initial Duration
   };
 
-  const char* commandInfo[] = {
+  const char* attackCommands[] = {
+    "glitch",
+    "single",
+    "interrupt",
+    "interruptINC",
+    "interruptDCR",
+    "interruptINCSU",
+    "interruptDCRSD",
+  };
+
+  const char* setInfo[] = {
     "Set State (0 for Fault Pin to be LOW in normal state and 1 for Fault Pin to be HIGH in normal state)",
     "Maximum Fault Duration (Maximum Fault Duration to permit for incremental stepping)",
     "Universal Debounce Delay (Debounce Period for buttons in the circuit",
     "Increment Factor (Time Period to increment in incremental stepping)",
     "Decrement Factor (Time Period to decrement in decremental stepping", 
     "Initial Duration (Initial Duration for incremental and decremental stepping)",
+  };
+
+  const char* attackInfo[] = {
+    "glitch - Glitch Mode for attacking",
+    "single - Glitch once (Usage: attack glitch single <microseconds>)",
+    "interrupt - Glitch with Interrupt Mode, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interrupt)",
+    "interruptINC - Increment time with increment parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptINC)",
+    "interruptDCR - Decrement time with decrement parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptDCR)",
+    "interruptINCSU - Increment time with increment parameter with stepping up, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interruptINCSU)",
+    "interruptDCRSD - Decrement time with decrement parameter with stepping down, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interrputDCCRSD)",
   };
 
   if (Serial.available()) {                         // Check the availability of Serial Console 
@@ -225,7 +245,6 @@ void serial_console() {
       String variableName = command.substring(4, command.indexOf(' ', 4));
       String valueString = command.substring(command.lastIndexOf(' ') + 1);
       int value = valueString.toInt();
-      
 
       if (variableName == setCommands[0]) {
         state = value;
@@ -278,8 +297,8 @@ void serial_console() {
       Serial.println(firstParam);
       Serial.println(secondParam);
       Serial.println(thirdParam);
-      
-      if (firstParam == "glitch") {                   // Single Fault Injection (command: attack glitch single 10)
+
+      if (firstParam == "glitch") {
         if (secondParam == "single") {
           Serial.println("Glitched Single!");
           digital_fault_injector(thirdParam.toInt());
@@ -336,10 +355,17 @@ void serial_console() {
     } else if (command.startsWith("HELP")) {
       Serial.println("Fault Injector - A Fault Injection Toolkit\n");
       Serial.println("- All time values are in Mircoseconds\n");
-      for (int index = 0; index < 5; index++) {
+      Serial.println("Configuration Commands\n");
+      for (int index = 0; index < sizeof(setCommands) / sizeof(setCommands[0]); index++) {
         Serial.print(setCommands[index]);
         Serial.print(" - ");
-        Serial.println(commandInfo[index]);
+        Serial.println(setInfo[index]);
+      }
+      Serial.println("\nAttack Commands\n");
+      for (int index = 0; index < sizeof(attackCommands) / sizeof(setCommands[0]); index++) {
+        Serial.print(attackCommands[index]);
+        Serial.print(" - ");
+        Serial.println(attackInfo[index]);
       }
     } else if (command.startsWith("EXIT")) {
       Serial.println("Exiting Serial Console");
@@ -352,30 +378,4 @@ void loop() {
 
   serial_console();
 
-  // // Listen for the Trigger
-  // while (true) {
-
-  //   // Debounce Mechanism
-  //   int triggerReading = digitalRead(TRIGGER_PIN);  // Read the Trigger Pin 
-  //   if (triggerReading != lastTriggerState) {
-  //     lastTriggerDebounceTime = millis();           // Reset the Trigger Debounce Timer 
-  //   }
-
-  //   if ((millis() - lastTriggerDebounceTime) > universalDebounceDelay) {    // Check if Debounce Delay for Trigger Pin has been passed
-  //     if (triggerReading != triggerState) {
-  //       triggerState = triggerReading;         // Set Trigger State to new Trigger Reading 
-
-  //       // Fault Injection Function
-  //       if (lastTriggerState == LOW) {        // Inject Fault if State changes from LOW to HIGH
-  //         digital_incremental_interrupt_fault_injector(0, maxFaultDuration, 1);
-
-  //         counter++;
-  //         Serial.print("Fault Number: ");
-  //         Serial.println(counter);
-  //       }
-  //       break;                                // Break out of the loop
-  //     }
-  //   }
-  //   lastTriggerState = triggerReading;    // Update the last trigger state 
-  // }
 }
