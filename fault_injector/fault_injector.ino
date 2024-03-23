@@ -268,6 +268,39 @@ void serial_console() {
       } else {
         Serial.println("Invalid Command!");
       }
+    } else if (command.startsWith("attack")) {
+      int spaceIndex1 = command.indexOf(' ');
+      int spaceIndex2 = command.indexOf(' ', spaceIndex1 + 1);
+      
+      String firstParam = command.substring(spaceIndex1 + 1, spaceIndex2);
+      int spaceIndex3 = command.indexOf(' ', spaceIndex2 + 1);
+      
+      String secondParam = command.substring(spaceIndex2 + 1, spaceIndex3);
+      String thirdParam = command.substring(spaceIndex3 + 1);
+
+      Serial.println(firstParam);
+      Serial.println(secondParam);
+      Serial.println(thirdParam);
+      
+      if (firstParam == "glitch") {                   // Single Fault Injection (command: attack glitch single 10)
+        if (secondParam == "single") {
+          Serial.println("Glitched Single!");
+          digital_fault_injector(thirdParam.toInt());
+        } else if (secondParam == "interrupt") {
+          Serial.println("Glitched Interrupted!");
+          digital_interrupted_fault_injector(thirdParam.toInt());
+        } else if (secondParam == "interruptINC") {
+          digital_incremental_interrupt_fault_injector(initialDuration, maxFaultDuration, incrementFactor);
+        } else if (secondParam == "interruptDCR") {
+          digital_decremental_interrupt_fault_injector(initialDuration, maxFaultDuration, decrementFactor);
+        } else if (secondParam == "interruptINCSU") {
+          step_up_digital_incremental_interrupt_fault_injector(initialDuration, incrementFactor); 
+        } else if (secondParam == "interruptDCRSD") {
+          step_down_digital_decremental_interrupt_fault_injector(initialDuration, decrementFactor); 
+        } else {
+          Serial.println("Invalid Command!");
+        }
+      } 
     } else if (command.startsWith("LIST")) {
       Serial.print("Trigger Pin = ");
       Serial.println(TRIGGER_PIN);
@@ -302,9 +335,7 @@ void serial_console() {
 
       Serial.print("Initial Duration = ");
       Serial.println(initialDuration);
-
-    }  else if (command.startsWith("execute")) {
-      Serial.println("Under Development!");
+      
     } else if (command.startsWith("HELP")) {
       Serial.println("Fault Injector - A Fault Injection Toolkit\n");
       Serial.println("- All time values are in Mircoseconds\n");
