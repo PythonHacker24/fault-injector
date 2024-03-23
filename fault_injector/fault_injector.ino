@@ -29,7 +29,7 @@
 uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Register is Required)
 uint8_t DIGITAL_FAULT_PIN = D2;          // Digital Output Pin
 uint8_t ANALOG_FAULT_PIN = D3;           // Analog Output Pin
-uint8_t INTERRUPT_PIN = D4;              // Interupt Input Pin (Pull Down Register is Required)
+uint8_t INTERRUPT_PIN = D8;              // Interupt Input Pin (Pull Down Register is Required)
 
 // Default Define Normal State and Fault State 
 byte normalState = 0x0;
