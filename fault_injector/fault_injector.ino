@@ -23,6 +23,12 @@
 // Initial Duration and Increment Factor or Decrement Factor must be the arguements 
 
 // Add Clock Fault Injection Support: When Pulse is HIGH, glitch with LOW Voltage. When Pulse is LOW, glitch with HIGH Voltage.
+// When the INTERRUPT_PIN is pushed, the fault must be injected into the clock signal, depending upon it's clock state. 
+// If state = 0, glitch when the clock is LOW and when state = 1, glitch when the clock is HIGH. So it's about the state it has.
+// If it is not on the desired state, then just glitch it on next phase, that is the opposite state. 
+// This needs to be fast enough and efficient in checking in state of the clock when the interrupt is triggered.
+// Also it does matter where the fault is injected. Direct triggering would be close to the last state in case of glitching in next stage. So a delay must be declared.
+// The frequency must be considered while considering the delay. With accurate measurements, things would work great.
 
 #include <ESP8266WiFi.h>
 
@@ -73,7 +79,7 @@ void state_declaration(int state) {
 
 void setup() {
   pinMode(TRIGGER_PIN, INPUT);                  // Trigger Button will be connected here
-  pinMode(INTERRUPT_PIN, INPUT);                // Interrupt Signal 
+  pinMode(INTERRUPT_PIN, INPUT);                // Interrupt Signal /Users/adityapatil/Hacker_Notes/upnpd-wr845n.gpr
   pinMode(DIGITAL_FAULT_PIN, OUTPUT);           // Digital Fault Injection Pin 
   pinMode(ANALOG_FAULT_PIN, OUTPUT);            // Analog Fault Injection Pin
 
