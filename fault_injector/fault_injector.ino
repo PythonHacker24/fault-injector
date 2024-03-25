@@ -45,15 +45,15 @@ byte faultState = 0x1;
 int faultDuration = 0;
 int maxFaultDuration = 100; 
 
-int incrementFactor = 0;
-int decrementFactor = 0;
+int incrementFactor = 1;
+int decrementFactor = 1;
 int initialDuration = 0; 
 
 // Trigger Debounce Mechanism Declarations 
 int triggerState;             // Current State of the Trigger
 int lastTriggerState = LOW;   // Initialise last trigger state to LOW
 
-// Stepping Debounce Mechanism Declarations 
+// Stepping Debounce Mechanism Declarations for Incremental and Decremental 
 int stepperState;
 int lastStepperState = LOW;
 
@@ -63,6 +63,44 @@ int universalDebounceDelay = 10;              // Debounce Delay time for all but
 
 int counter = 0;   
 int state = 0;
+
+const char* setCommands[] = {
+  "ST",                             // Set State 
+  "MFD",                            // Set Maximum Fault Duration
+  "UDD",                            // Set Universal Debounce Delay
+  "IF",                             // Set Increment Factor 
+  "DF",                             // Set Decrement Factor 
+  "ID",                             // Set Initial Duration
+};
+
+const char* attackCommands[] = {
+  "glitch",
+  "single",
+  "interrupt",
+  "interruptINC",
+  "interruptDCR",
+  "interruptINCSU",
+  "interruptDCRSD",
+};
+
+const char* setInfo[] = {
+  "Set State (0 for Fault Pin to be LOW in normal state and 1 for Fault Pin to be HIGH in normal state)",
+  "Maximum Fault Duration (Maximum Fault Duration to permit for incremental stepping)",
+  "Universal Debounce Delay (Debounce Period for buttons in the circuit",
+  "Increment Factor (Time Period to increment in incremental stepping)",
+  "Decrement Factor (Time Period to decrement in decremental stepping", 
+  "Initial Duration (Initial Duration for incremental and decremental stepping)",
+};
+
+const char* attackInfo[] = {
+  "glitch - Glitch Mode for attacking",
+  "single - Glitch once (Usage: attack glitch single <interval>)",
+  "interrupt - Glitch with Interrupt Mode, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interrupt)",
+  "interruptINC - Increment time with increment parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptINC <interval>)",
+  "interruptDCR - Decrement time with decrement parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptDCR <interval>)",
+  "interruptINCSU - Increment time with increment parameter with stepping up, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interruptINCSU)",
+  "interruptDCRSD - Decrement time with decrement parameter with stepping down, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interrputDCCRSD)",
+};
 
 // Declare States of Operation in Fault Pin
 void state_declaration(int state) {
@@ -115,34 +153,18 @@ void digital_interrupted_fault_injector(int fault_duration) {
 // Notes: Combine Analog and Digital Variable Incrmental and Decremental Functions 
 
 // Variable Incremental Fault Injector Function
-void digital_incremental_interrupt_fault_injector(int initialDuration, int maxFaultDuration, int incrementFactor) {
-  // D4 will be the interrupt reading
-  int interruptReading;
+void digital_incremental_fault_injector(int initialDuration, int maxFaultDuration, int incrementFactor, int delayMicro) {
   for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
-    interruptReading = digitalRead(INTERRUPT_PIN);
-    if (interruptReading == HIGH) { 
-      break; 
-    }
     digital_fault_injector(downTime);
-    Serial.print("Downtime: ");
-    Serial.println(downTime);
-    delay(500);
+    delayMicroseconds(delayMicro);
   }
 }
 
 // Variable Decremental Fault Injector Funcrion
-void digital_decremental_interrupt_fault_injector(int initialDuration, int maxFaultDuration, int decrementFactor) {
-  // D4 will be the interrupt reading
-  int interruptReading;
+void digital_decremental_fault_injector(int initialDuration, int maxFaultDuration, int decrementFactor, int delayMicro) {
   for (int downTime = maxFaultDuration; downTime > initialDuration; downTime = downTime - decrementFactor) {
-    interruptReading = digitalRead(INTERRUPT_PIN);
-    if (interruptReading == HIGH) {
-      break;
-    }
     digital_fault_injector(downTime);
-    Serial.print("Downtime: ");
-    Serial.println(downTime);
-    delay(500);
+    delayMicroseconds(delayMicro);
   }
 }
 
@@ -204,43 +226,6 @@ void step_down_digital_decremental_interrupt_fault_injector(int initialDuration,
 void serial_console() {
 
   Serial.flush();
-  const char* setCommands[] = {
-    "ST",                             // Set State 
-    "MFD",                            // Set Maximum Fault Duration
-    "UDD",                            // Set Universal Debounce Delay
-    "IF",                             // Set Increment Factor 
-    "DF",                             // Set Decrement Factor 
-    "ID",                             // Set Initial Duration
-  };
-
-  const char* attackCommands[] = {
-    "glitch",
-    "single",
-    "interrupt",
-    "interruptINC",
-    "interruptDCR",
-    "interruptINCSU",
-    "interruptDCRSD",
-  };
-
-  const char* setInfo[] = {
-    "Set State (0 for Fault Pin to be LOW in normal state and 1 for Fault Pin to be HIGH in normal state)",
-    "Maximum Fault Duration (Maximum Fault Duration to permit for incremental stepping)",
-    "Universal Debounce Delay (Debounce Period for buttons in the circuit",
-    "Increment Factor (Time Period to increment in incremental stepping)",
-    "Decrement Factor (Time Period to decrement in decremental stepping", 
-    "Initial Duration (Initial Duration for incremental and decremental stepping)",
-  };
-
-  const char* attackInfo[] = {
-    "glitch - Glitch Mode for attacking",
-    "single - Glitch once (Usage: attack glitch single <microseconds>)",
-    "interrupt - Glitch with Interrupt Mode, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interrupt)",
-    "interruptINC - Increment time with increment parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptINC)",
-    "interruptDCR - Decrement time with decrement parameter, INTERRUPT_PIN takes Interrupt Signal (Usage: attack glitch interruptDCR)",
-    "interruptINCSU - Increment time with increment parameter with stepping up, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interruptINCSU)",
-    "interruptDCRSD - Decrement time with decrement parameter with stepping down, INTERRUPT_PIN takes Stepping Signal (Usage: attack glitch interrputDCCRSD)",
-  };
 
   if (Serial.available()) {                         // Check the availability of Serial Console 
     String command = Serial.readStringUntil('\n');  // Take commands from the Serial Console 
@@ -299,24 +284,20 @@ void serial_console() {
       String secondParam = command.substring(spaceIndex2 + 1, spaceIndex3);
       String thirdParam = command.substring(spaceIndex3 + 1);
 
-      Serial.println(firstParam);
-      Serial.println(secondParam);
-      Serial.println(thirdParam);
-
-      if (firstParam == "glitch") {
-        if (secondParam == "single") {
+      if (firstParam == attackCommands[0]) {
+        if (secondParam == attackCommands[1]) {
           Serial.println("Glitched Single!");
           digital_fault_injector(thirdParam.toInt());
-        } else if (secondParam == "interrupt") {
+        } else if (secondParam == attackCommands[2]) {
           Serial.println("Glitched Interrupted!");
           digital_interrupted_fault_injector(thirdParam.toInt());
-        } else if (secondParam == "interruptINC") {
-          digital_incremental_interrupt_fault_injector(initialDuration, maxFaultDuration, incrementFactor);
-        } else if (secondParam == "interruptDCR") {
-          digital_decremental_interrupt_fault_injector(initialDuration, maxFaultDuration, decrementFactor);
-        } else if (secondParam == "interruptINCSU") {
+        } else if (secondParam == attackCommands[3]) {
+          digital_incremental_fault_injector(initialDuration, maxFaultDuration, incrementFactor, thirdParam.toInt());
+        } else if (secondParam == attackCommands[4]) {
+          digital_decremental_fault_injector(initialDuration, maxFaultDuration, decrementFactor, thirdParam.toInt());
+        } else if (secondParam == attackCommands[5]) {
           step_up_digital_incremental_interrupt_fault_injector(initialDuration, incrementFactor); 
-        } else if (secondParam == "interruptDCRSD") {
+        } else if (secondParam == attackCommands[6]) {
           step_down_digital_decremental_interrupt_fault_injector(initialDuration, decrementFactor); 
         } else {
           Serial.println("Invalid Command!");
