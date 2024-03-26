@@ -45,9 +45,6 @@ The code provided here is nearly enough to explain the wiring diagram of the cir
 - Workbench Components like Breadboard, Jumper Cables, Switching Mosfets are per requirements, Logic Analysers (for visualising digital fault injections), Oscilloscope (for digital and analog fault injections), etc. 
 - Required Interfaces (for example, EMF induction circuit if EMF is to be used for fault injection)
 
-#### Story of Pull Down Registors
-While the initial phases of development of this project, it was found in a very hard way that pull down registors are required to keep the input pins grounded and at LOW state. Due to the loops and escape mechanism in the code, noise around the workspace can cause unintentional input triggering and escape loops causing wierd behaviour. Hence, it is recommended to use 10K Ohms pull down registors to every input pins to keep them at LOW state, wherever necessary. 
-
 ## Warning!
 
 Note that this attack can unintentionally damage the circuit due to a lot of factors. Fault Injection attacks can be dangeruous and can cause permenant damage to the device. Hence, use this tool wih caution. 
