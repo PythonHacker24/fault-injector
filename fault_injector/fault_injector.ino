@@ -30,6 +30,8 @@
 // Add conditional statements to glitch functions to check arguements and avoid executing them with wrong configurations. 
 // Make the default settings right, so in case of first time user uses it, things go right.
 
+// Remove all the print statements added for debugging, they take some time for execution and alter with the microsecond delays. 
+
 #include <ESP8266WiFi.h>
 
 uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Resistor is Required)
