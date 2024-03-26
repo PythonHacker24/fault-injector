@@ -3,7 +3,7 @@
 
   Author: Aditya Patil <Hack the Planet!>
 
-  Fault Injection Attack can be used for attacking electronic circuits in various ways.
+  Fault Injection Attack can be used for attacking electronic circuits in various ways. This is a Fault Injection toolkit for hunting fault injection vulnerabilities in circuits. 
   Requirements:
     Push Button - Trigger Button 
     Jumper Wires 
@@ -135,8 +135,8 @@ void setup() {
   state_declaration(state);
 
   digitalWrite(DIGITAL_FAULT_PIN, normalState);        // Fault Pin State to HIGH
+  
   Serial.begin(9600); 
-
   Serial.setDebugOutput(false);     // Disable debug output
   Serial.flush();                   // Clear any remaining data in the serial buffer
 }
@@ -152,8 +152,8 @@ void digital_fault_injector(int fault_duration) {
 // Add debounce mechanism here
 // Digital Fault Injection Function with Interrupt
 void digital_interrupted_fault_injector(int fault_duration) {
+  
   while (true) {
-
     int interruptReading = digitalRead(INTERRUPT_PIN);
     if (interruptReading != lastInterruptState) {
       lastInterruptDebounceTime = millis();
