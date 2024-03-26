@@ -19,9 +19,6 @@
 
 // Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
 
-// Add Setp by Step Incremental and Decremental Functions, but first test the current functionalities
-// Initial Duration and Increment Factor or Decrement Factor must be the arguements 
-
 // Add Clock Fault Injection Support: When Pulse is HIGH, glitch with LOW Voltage. When Pulse is LOW, glitch with HIGH Voltage.
 // When the INTERRUPT_PIN is pushed, the fault must be injected into the clock signal, depending upon it's clock state. 
 // If state = 0, glitch when the clock is LOW and when state = 1, glitch when the clock is HIGH. So it's about the state it has.
@@ -29,6 +26,9 @@
 // This needs to be fast enough and efficient in checking in state of the clock when the interrupt is triggered.
 // Also it does matter where the fault is injected. Direct triggering would be close to the last state in case of glitching in next stage. So a delay must be declared.
 // The frequency must be considered while considering the delay. With accurate measurements, things would work great.
+
+// Add conditional statements to glitch functions to check arguements and avoid executing them with wrong configurations. 
+// Make the default settings right, so in case of first time user uses it, things go right.
 
 #include <ESP8266WiFi.h>
 
@@ -67,6 +67,8 @@ int universalDebounceDelay = 10;              // Debounce Delay time for all but
 
 int counter = 0;   
 int state = 0;
+
+int consoleMode = 1; 
 
 const char* setCommands[] = {
   "ST",                             // Set State 
@@ -167,12 +169,6 @@ void digital_interrupted_fault_injector(int fault_duration) {
     }
     lastInterruptState = interruptReading; 
   }
-    // int interruptReading = digitalRead(INTERRUPT_PIN); 
-    // if (interruptReading == HIGH) {
-    //   digital_fault_injector(fault_duration);
-    //   Serial.println("Fault Injected on Interrupt!");
-    //   break;
-    // }
 }
 
 // Variable Incremental Fault Injector Function
@@ -384,7 +380,7 @@ void serial_console() {
 }
 
 void loop() {
-
-  serial_console();
-
+  if (consoleMode == 1) {
+    serial_console();
+  }
 }
