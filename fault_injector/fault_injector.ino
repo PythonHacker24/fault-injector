@@ -152,40 +152,51 @@ void digital_fault_injector(int fault_duration) {
 // Add debounce mechanism here
 // Digital Fault Injection Function with Interrupt
 void digital_interrupted_fault_injector(int fault_duration) {
-  
-  while (true) {
-    int interruptReading = digitalRead(INTERRUPT_PIN);
-    if (interruptReading != lastInterruptState) {
-      lastInterruptDebounceTime = millis();
-    }
-    if ((millis() - lastInterruptDebounceTime) > universalDebounceDelay) {
-      if (interruptReading != interruptState) {
-        interruptState = interruptReading;
-
-        if (lastInterruptState == LOW) {
-          digital_fault_injector(fault_duration);
-          Serial.println("Fault Injected on Interrupt!");
-        }
-        break;
+  if (fault_duration < 0) {
+    Serial.println("Fault Duration cannot be negative!");
+  } else {
+    while (true) {
+      int interruptReading = digitalRead(INTERRUPT_PIN);
+      if (interruptReading != lastInterruptState) {
+        lastInterruptDebounceTime = millis();
       }
+      if ((millis() - lastInterruptDebounceTime) > universalDebounceDelay) {
+        if (interruptReading != interruptState) {
+          interruptState = interruptReading;
+
+          if (lastInterruptState == LOW) {
+            digital_fault_injector(fault_duration);
+            Serial.println("Fault Injected on Interrupt!");
+          }
+          break;
+        }
+      }
+      lastInterruptState = interruptReading; 
     }
-    lastInterruptState = interruptReading; 
   }
 }
 
 // Variable Incremental Fault Injector Function
 void digital_incremental_fault_injector(int initialDuration, int maxFaultDuration, int incrementFactor, int delayMicro) {
-  for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
-    digital_fault_injector(downTime);
-    delayMicroseconds(delayMicro);
+  if (initialDuration < 0 || maxFaultDuration < 0 || incrementFactor < 0 || delayMicro < 0) {
+    Serial.println("Parameters cannot be negative!");
+  } else {
+    for (int downTime = 0; downTime < maxFaultDuration; downTime = downTime + incrementFactor) {
+      digital_fault_injector(downTime);
+      delayMicroseconds(delayMicro);
+    }
   }
 }
 
 // Variable Decremental Fault Injector Funcrion
 void digital_decremental_fault_injector(int initialDuration, int maxFaultDuration, int decrementFactor, int delayMicro) {
-  for (int downTime = maxFaultDuration; downTime > initialDuration; downTime = downTime - decrementFactor) {
-    digital_fault_injector(downTime);
-    delayMicroseconds(delayMicro);
+  if (initialDuration < 0 || maxFaultDuration < 0 || decrementFactor < 0 || delayMicro < 0) {
+    Serial.println("Parameters cannot be negative!");
+  } else {  
+    for (int downTime = maxFaultDuration; downTime > initialDuration; downTime = downTime - decrementFactor) {
+      digital_fault_injector(downTime);
+      delayMicroseconds(delayMicro);
+    }
   }
 }
 
@@ -193,54 +204,62 @@ void digital_decremental_fault_injector(int initialDuration, int maxFaultDuratio
 // This is particularly helpful for debugging manually and finding the correct time duration for fault injection
 // Here, D4 is now the stepping function
 void step_up_digital_incremental_interrupt_fault_injector(int initialDuration, int incrementFactor) {
-  int intervalFactor = 0;
-  while (true) {
-    // Listen for the stepping triggers 
+  if (initialDuration < 0 || incrementFactor < 0) {
+    Serial.println("Parameters cannot be negative!");
+  } else {
+    int intervalFactor = 0;
     while (true) {
-      
-      int stepperReading = digitalRead(INTERRUPT_PIN);
-      if (stepperReading != lastStepperState) {
-        lastStepperDebounceTime = millis();
-      }
-      if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
-        if (stepperReading != stepperState) {
-          stepperState = stepperReading;
-
-          if (lastStepperState == LOW) {
-            digital_fault_injector(initialDuration + intervalFactor);
-          }
-          break;
+      // Listen for the stepping triggers 
+      while (true) {
+        
+        int stepperReading = digitalRead(INTERRUPT_PIN);
+        if (stepperReading != lastStepperState) {
+          lastStepperDebounceTime = millis();
         }
+        if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
+          if (stepperReading != stepperState) {
+            stepperState = stepperReading;
+
+            if (lastStepperState == LOW) {
+              digital_fault_injector(initialDuration + intervalFactor);
+            }
+            break;
+          }
+        }
+        lastStepperState = stepperReading;
       }
-      lastStepperState = stepperReading;
+      intervalFactor += incrementFactor;
     }
-    intervalFactor += incrementFactor;
   }
 }
 
 void step_down_digital_decremental_interrupt_fault_injector(int initialDuration, int decrementFactor) {
-  int intervalFactor = 0;
-  while (true) {
-    // Listen for the stepping triggers 
+  if (initialDuration < 0 || decrementFactor < 0) {
+    Serial.println("Parameters cannot be negative!");
+  } else {
+    int intervalFactor = 0;
     while (true) {
-      
-      int stepperReading = digitalRead(INTERRUPT_PIN);
-      if (stepperReading != lastStepperState) {
-        lastStepperDebounceTime = millis();
-      }
-      if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
-        if (stepperReading != stepperState) {
-          stepperState = stepperReading;
-
-          if (lastStepperState == LOW) {
-            digital_fault_injector(initialDuration - intervalFactor);
-          }
-          break;
+      // Listen for the stepping triggers 
+      while (true) {
+        
+        int stepperReading = digitalRead(INTERRUPT_PIN);
+        if (stepperReading != lastStepperState) {
+          lastStepperDebounceTime = millis();
         }
+        if ((millis() - lastStepperDebounceTime) > universalDebounceDelay) {
+          if (stepperReading != stepperState) {
+            stepperState = stepperReading;
+
+            if (lastStepperState == LOW) {
+              digital_fault_injector(initialDuration - intervalFactor);
+            }
+            break;
+          }
+        }
+        lastStepperState = stepperReading;
       }
-      lastStepperState = stepperReading;
+      intervalFactor += decrementFactor;
     }
-    intervalFactor += decrementFactor;
   }
 }
 
