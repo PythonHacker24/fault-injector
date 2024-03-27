@@ -149,7 +149,6 @@ void digital_fault_injector(int fault_duration) {
   digitalWrite(DIGITAL_FAULT_PIN, normalState); // Set back to normal state
 }
 
-// Add debounce mechanism here
 // Digital Fault Injection Function with Interrupt
 void digital_interrupted_fault_injector(int fault_duration) {
   if (fault_duration < 0) {
