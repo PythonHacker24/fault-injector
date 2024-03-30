@@ -17,21 +17,6 @@
     INTERRUPT_PIN - Interrupt Input Pin
 */
 
-// Notes: For Analog Fault Injections, use PWM Signals and a Low Pass Filter
-
-// Add Clock Fault Injection Support: When Pulse is HIGH, glitch with LOW Voltage. When Pulse is LOW, glitch with HIGH Voltage.
-// When the INTERRUPT_PIN is pushed, the fault must be injected into the clock signal, depending upon it's clock state. 
-// If state = 0, glitch when the clock is LOW and when state = 1, glitch when the clock is HIGH. So it's about the state it has.
-// If it is not on the desired state, then just glitch it on next phase, that is the opposite state. 
-// This needs to be fast enough and efficient in checking in state of the clock when the interrupt is triggered.
-// Also it does matter where the fault is injected. Direct triggering would be close to the last state in case of glitching in next stage. So a delay must be declared.
-// The frequency must be considered while considering the delay. With accurate measurements, things would work great.
-
-// Add conditional statements to glitch functions to check arguements and avoid executing them with wrong configurations. 
-// Make the default settings right, so in case of first time user uses it, things go right.
-
-// Remove all the print statements added for debugging, they take some time for execution and alter with the microsecond delays. 
-
 #include <ESP8266WiFi.h>
 
 uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Resistor is Required)
