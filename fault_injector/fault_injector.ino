@@ -17,6 +17,13 @@
     INTERRUPT_PIN - Interrupt Input Pin
 */
 
+/*
+Notes:
+
+1. Add a analyser built in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger in certian specific event like a hex value from the digital line passing. 
+  It's like a logic analyser so a data decryption and interpretion must be considered. 
+*/
+
 #include <ESP8266WiFi.h>
 
 uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Resistor is Required)
