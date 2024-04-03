@@ -27,6 +27,13 @@ Triggering of Injections can be varied with feedbacks with external signals. Thi
 #### Step by Step Increments and Decrements 
 Stepping up and down with push buttons to adjust voltage glitches helps in finding the exact spot for the fault injection attack with manual analysis. This feature allows users to use push button to increment or decrement (as per the functions setup) and step through various time delays to manually analyse the behaviour of the target.   
 
+### Power of Feedback Loop
+While performing Fault Injections, it is important to glitch the signals with very precise timing. This becomes tedious when performing sophisticated attacks over an hardware circuit. Hence, automating the glitching process to find the perfect spot for attack should be automated.
+
+When faults are injected into circuits, various circuits behave differently. Hence, this behaviour needs to be taken into account while automating the hunting process. For example, certian hardware with Serial Ouput tend to flood the Serial Console with huge ammount of data, which might contain some useful information about the device. Hence, capturing it and triggering halt can be useful to stop the attack in that case. Furthermore, too much hard glitches can cause the device to reset. Hence, getting a feedback from reset leds or testpoints can be useful to stop the attack with high magnitude of faults in the circuit. 
+
+Feedback loops open a lot of doors for advancements in automating the fault injection and exposing vulnerabilities. This interrupt feedback can be paired with computers with higher processing power than the microcontroller and use algorithms to analyse and adjust the parameters. 
+
 ## Setting up the circuit
 
 The code provided here is nearly enough to explain the wiring diagram of the circuit. Various parameters needs to be adjusted while developing the circuit, hence adjusting them before flashing the microcontroller is a good practice.
@@ -44,6 +51,14 @@ The code provided here is nearly enough to explain the wiring diagram of the cir
 - Pull Down Registors (10K Ohms) 
 - Workbench Components like Breadboard, Jumper Cables, Switching Mosfets are per requirements, Logic Analysers (for visualising digital fault injections), Oscilloscope (for digital and analog fault injections), etc. 
 - Required Interfaces (for example, EMF induction circuit if EMF is to be used for fault injection)
+
+#### Flash the Code:
+Flash the code into the ESP8266 NodeMCU (For example, with Arduino IDE). It is recommended to flash the NodeMCU before connecting it to other components in the circuit as it might interfer with programming it. 
+
+#### Connect the Circuit 
+Connect the components as per configured in the code. In case default configurations are made, connect them as per the comments mentioned in the code. 
+
+The circuit architecture is very simple. All the pins marked with input just needs a 3.3V input signal to get triggered. For output pins, it would throw 3.3V. These signals can be interfaced with various other modules for controlling the fault injection.  
 
 ## Warning!
 
