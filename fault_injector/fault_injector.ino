@@ -21,7 +21,8 @@
 Notes:
 
 1. Add a analyser built in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger in certian specific event like a hex value from the digital line passing. 
-  It's like a logic analyser so a data decryption and interpretion must be considered. 
+  It's like a logic analyser so a data decryption and interpretion must be considered.
+2. For adjustable voltage on target, PWN signal generation can be used to hook with an voltage control module to adjust the voltage from serial console. This would be helpful while designing a fault injection board.
 */
 
 #include <ESP8266WiFi.h>
