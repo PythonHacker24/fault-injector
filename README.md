@@ -14,6 +14,8 @@ This attack is useful in cases of jumping instructions inside a microprocessor o
 
 Since fault injections are so cool and need to be precise, a lot of work has to be put into doing it. It becomes expensive to carry out these attacks with dedicated tools and circuit. Hence, this project was developed, where efforts have been made to develop a device that can be crafted with inexpensive microcontrollers like ESP8266, which is developed with all required functionalities, or as much as possible. 
 
+Note that this is a controller which takes user input and provided a digital output (3.3V in case of ESP8266). With other circuits with different operatinal voltage, it is recommended to use supplimentary components to adjust them. This devive works as the logic module in the whole setup and not the physical parameter deciding module. Hence, physical parameters should be setup by the user themselves. 
+
 ### Features
 #### Precise Time Adjustments 
 This prototype with ESP8266 supports fault injections with microseconds of delay which can be adjusted. This is something that dependes upon the hardware used and it's support to causing delays.
