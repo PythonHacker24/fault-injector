@@ -31,6 +31,7 @@ uint8_t TRIGGER_PIN = D1;                // Trigger Input Pin (Pull Down Resisto
 uint8_t DIGITAL_FAULT_PIN = D2;          // Digital Output Pin
 uint8_t ANALOG_FAULT_PIN = D3;           // Analog Output Pin
 uint8_t INTERRUPT_PIN = D8;              // Interupt Input Pin (Pull Down Resistor is Required)
+uint8_t PWN_VOLTAGE_REGULATION_PIN = D4; // Using PWM signals to adjust voltage in circuits
 
 // Default Define Normal State and Fault State 
 byte normalState = 0x0;
@@ -65,6 +66,9 @@ int state = 0;
 
 int consoleMode = 1; 
 
+// PWM Duty Cycle Declaration 
+int voltagePWMDutyCycle = 0;
+
 const char* setCommands[] = {
   "ST",                             // Set State 
   "MFD",                            // Set Maximum Fault Duration
@@ -72,6 +76,7 @@ const char* setCommands[] = {
   "IF",                             // Set Increment Factor 
   "DF",                             // Set Decrement Factor 
   "ID",                             // Set Initial Duration
+  "VL",                             // Set Voltage Levels
 };
 
 const char* attackCommands[] = {
@@ -91,6 +96,7 @@ const char* setInfo[] = {
   "Increment Factor (Time Period to increment in incremental stepping)",
   "Decrement Factor (Time Period to decrement in decremental stepping", 
   "Initial Duration (Initial Duration for incremental and decremental stepping)",
+  "Setting Voltage Level with PWM signals (for PWM controlled voltage reguation modules)"
 };
 
 const char* attackInfo[] = {
@@ -121,9 +127,11 @@ void setup() {
   pinMode(INTERRUPT_PIN, INPUT);                // Interrupt Signal 
   pinMode(DIGITAL_FAULT_PIN, OUTPUT);           // Digital Fault Injection Pin 
   pinMode(ANALOG_FAULT_PIN, OUTPUT);            // Analog Fault Injection Pin
+  pinMode(PWN_VOLTAGE_REGULATION_PIN, OUTPUT);  // PWM contolled voltage regulation circuit 
 
   analogWriteFreq(1000);                        // Setting PWM Frequency to 1000 Hz 
   analogWriteResolution(10);                    // Setting PWM Resolution to 10 bits (1024 Levels)
+  analogWrite(PWN_VOLTAGE_REGULATION_PIN, 0);   // Initialising PWM signals with 0% duty cycles 
 
   state_declaration(state);
 
@@ -255,6 +263,21 @@ void step_down_digital_decremental_interrupt_fault_injector(int initialDuration,
   }
 }
 
+// PWM signal generator function for PWM controlled voltage regulation modules 
+void pwm_voltage_regulation(int duty_cycle, int pwm_state) {
+  if (pwm_state == 1) {
+    pinMode(PWN_VOLTAGE_REGULATION_PIN, OUTPUT);
+    int valid_duty_cycle = constrain(duty_cycle, 0, 1023);
+
+    analogWrite(PWN_VOLTAGE_REGULATION_PIN, valid_duty_cycle);
+    voltagePWMDutyCycle = valid_duty_cycle;
+  } else if (pwm_state == 0) {
+    pinMode(PWN_VOLTAGE_REGULATION_PIN, INPUT);
+    voltagePWMDutyCycle = 0;
+  }
+}
+
+// Serial Console for interacting with the board
 void serial_console() {
 
   Serial.flush();
@@ -303,6 +326,14 @@ void serial_console() {
         initialDuration = value;
         Serial.print("Initial Duration = ");
         Serial.println(initialDuration);
+      } else if (variableName == setCommands[6]){
+        if (value == 0) {
+          pwm_voltage_regulation(value, 0);
+        } else if (value == 1) {
+          pwm_voltage_regulation(value, 1);
+        }
+        Serial.print("Voltage Level = ");
+        Serial.println(voltagePWMDutyCycle);
       } else {
         Serial.println("Invalid Command!");
       }
