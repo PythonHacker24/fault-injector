@@ -22,7 +22,9 @@ Notes:
 
 1. Add a analyser built in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger in certian specific event like a hex value from the digital line passing. 
   It's like a logic analyser so a data decryption and interpretion must be considered.
-2. For adjustable voltage on target, PWN signal generation can be used to hook with an voltage control module to adjust the voltage from serial console. This would be helpful while designing a fault injection board.
+2. Add multiple channels for fault injection. Since ESP8266 has a lot of GPIO pins, it would be much more utilised.
+3. Add I2C communication for voltage regulation IC (MCP4725). 
+4. Add a Voltage Regulation IC controlled with I2C for both, digital voltage and analog voltage.
 */
 
 #include <ESP8266WiFi.h>
