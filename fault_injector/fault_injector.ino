@@ -20,13 +20,10 @@
 /*
 Notes:
 
-1. Add an analyser built-in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger certain specific events like a hex value from the digital line passing. 
-  It's like a logic analyser so data decryption and interpretation must be considered.
-2. Add multiple channels for fault injection. Since ESP8266 has a lot of GPIO pins, it would be much more utilised.
-3. Add I2C communication for voltage regulation IC (MCP4725). 
-4. Add a Voltage Regulation IC controlled with I2C for both, digital voltage and analog voltage.
-5. Develop a CLI tool to interact with fault-injector. The tool must support logs of input and output. Also, it must support writing scripts.
-6. Add a logic analysis function for feedback logic. This logic would be interpreted in the client tool and must support script writing. 
+1. Add multiple channels for fault injection. Since ESP8266 has a lot of GPIO pins, it would be much more utilised.
+2. Add I2C communication for voltage regulation IC (MCP4725) in digital fault injections. 
+3. Add a Voltage Regulation IC controlled with I2C for both, digital voltage and analog voltage.
+4. Develop a CLI tool to interact with fault-injector. The tool must support logs of input and output. Also, it must support writing scripts.
 */
 
 #include <ESP8266WiFi.h>
