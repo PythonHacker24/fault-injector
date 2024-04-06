@@ -36,6 +36,46 @@ When faults are injected into circuits, various circuits behave differently. Hen
 
 Feedback loops open a lot of doors for advancements in automating the fault injection and exposing vulnerabilities. This interrupt feedback can be paired with computers with higher processing power than the microcontroller and use algorithms to analyse and adjust the parameters. 
 
+### Automated Scripts 
+Since Serial Communication is used to interact with the fault-injector, right commands at the right time are required. Hence, developing automated scripts with Python (or any other language) can automate tasks that are repetative or triggering logics are required. 
+
+Since ESP8266 is a single core microcontroller, parallel task simultaneously is not possible. Writing Scripts to provide instructions with a multi-core CPU system would allow faster response to events.
+
+Example for Serial Communication with Python:
+```
+import serial
+import time 
+
+serial_port = '/dev/<esp8266>'      # modify this with the usb connection  
+baud_rate = 115200 
+
+# Include commands here
+commands = [
+    "command1",
+    "command2",
+    "command3",
+    "command4",
+]
+
+console = serial.Serial(serial_port, baud_rate, timeout=1)
+
+time.sleep(2)
+
+try:
+    while True:
+        # To read the Serial Data
+        if console.in_waiting > 0:
+            data = console.readline().decode('utf-8').rstrip()
+            print("Received:", data)
+            
+        # Executing all the commands one by one
+        for command in commands:
+            console.write(command.data_to_send.encode('utf-8') + b'\n'')
+
+except KeyboardInterrupt:
+    console.close()
+```
+
 ## Setting up the circuit
 
 The code provided here is nearly enough to explain the wiring diagram of the circuit. Various parameters needs to be adjusted while developing the circuit, hence adjusting them before flashing the microcontroller is a good practice.
