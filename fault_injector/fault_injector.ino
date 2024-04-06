@@ -25,6 +25,8 @@ Notes:
 2. Add multiple channels for fault injection. Since ESP8266 has a lot of GPIO pins, it would be much more utilised.
 3. Add I2C communication for voltage regulation IC (MCP4725). 
 4. Add a Voltage Regulation IC controlled with I2C for both, digital voltage and analog voltage.
+5. Develop a CLI tool to interact with fault-injector. The tool must support logs of input and output. Also, it must support writing scripts.
+6. Add a logic analysis function for feedback logic. This logic would be interpreted in the client tool and must support script writing. 
 */
 
 #include <ESP8266WiFi.h>
