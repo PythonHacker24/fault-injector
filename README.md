@@ -102,6 +102,19 @@ Connect the components as per configured in the code. In case default configurat
 
 The circuit architecture is very simple. All the pins marked with input just needs a 3.3V input signal to get triggered. For output pins, it would throw 3.3V. These signals can be interfaced with various other modules for controlling the fault injection.  
 
+## Getting Started 
+
+Connect the board with the computer and get access to the Serial Console. It is recommended to use Arduino IDE for it's capability to show enterred commands. Although, any Serial Communication tool can be used like picocom, minicom, screen, etc.
+To interact with the board, start with the help menu:
+```
+HELP
+```
+This will provide all the parameters and commands to set up the device for attacking. For example, use the following command to list all the parameters that are to be set:
+```
+LIST
+```
+By default, parameters are set to default values and need to be adjusted as per the attack.
+
 ## Warning!
 
 Note that this attack can unintentionally damage the circuit due to a lot of factors. Fault Injection attacks can be dangeruous and can cause permenant damage to the device. Hence, use this tool wih caution. 
