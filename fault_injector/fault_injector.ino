@@ -1,9 +1,9 @@
 /* 
-  Fault Injector for ESP8266 (nodeMCU) and Arduino (ESP8266 is preferred due to it's clock speed)
+  Fault Injector for ESP8266 (nodeMCU) and Arduino (ESP8266 is preferred due to its clock speed)
 
   Author: Aditya Patil <Hack the Planet!>
 
-  Fault Injection Attack can be used for attacking electronic circuits in various ways. This is a Fault Injection toolkit for hunting fault injection vulnerabilities in circuits. 
+  Fault Injection Attacks can be used to attack electronic circuits in various ways. This is a Fault Injection toolkit for hunting fault injection vulnerabilities in circuits. 
   Requirements:
     Push Button - Trigger Button 
     Jumper Wires 
@@ -20,8 +20,8 @@
 /*
 Notes:
 
-1. Add a analyser built in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger in certian specific event like a hex value from the digital line passing. 
-  It's like a logic analyser so a data decryption and interpretion must be considered.
+1. Add an analyser built-in into the fault injector. This would be interfaced with the feedback interrupt of the glitching trigger, which would trigger certain specific events like a hex value from the digital line passing. 
+  It's like a logic analyser so data decryption and interpretation must be considered.
 2. Add multiple channels for fault injection. Since ESP8266 has a lot of GPIO pins, it would be much more utilised.
 3. Add I2C communication for voltage regulation IC (MCP4725). 
 4. Add a Voltage Regulation IC controlled with I2C for both, digital voltage and analog voltage.
