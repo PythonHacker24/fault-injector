@@ -1,10 +1,12 @@
 # Fault Injector for ESP8266 and Arduino Boards 
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/PythonHacker24/fault-injector)
+
 ![Intro](https://raw.githubusercontent.com/PythonHacker24/fault-injector/main/images/intro-image.png)
 
 #### From the Workbench to the Battleground - Crafting a Fault Injection Attacker with an ESP8266 (or nearly any microcontrollers!)
 
-## What is Fault Injection Attack? 
+## What is a Fault Injection Attack? 
 
 Fault Injection Attacks is an hardware attack that glitches a hardware circuit to behave in a way which is not intended and cause uncertain behaviour that would be useful for a hacker. 
 
